@@ -13,6 +13,7 @@ enum Mode {
     VISUAL,     // Pressing V
     CREATE,     // Pressing C
     EDIT,       // Pressing E
+    MOVE,       // Pressing M
 };
 
 // Prototype for the grid drawing function
@@ -21,11 +22,14 @@ void draw_temporary_shape(RenderWindow& window, const std::vector<Vector2f>& ver
 Vector2f snap_to_grid(const Vector2f& point, float gridSize);
 void draw_vertex_markers(RenderWindow& window, const std::vector<Vector2f>& vertices);
 void SetupImGuiStyle();
+sf::Color float_3_color(float color[3]);
+void color_float_3(sf::Color color, float output[3]);
 
 std::vector<Sector> sectors;
 int selectedVertexIndex = -1;
 Vector2f offset;
 bool vertexSelected = false;
+
 int main() {
     RenderWindow window(VideoMode(900, 700), "Map Editor", Style::None | Style::Close);
     window.setFramerateLimit(60);
@@ -39,10 +43,17 @@ int main() {
     std::vector<Vector2f> vertices;
     sectors.push_back(*(new Sector));
     int current_sector = 0;      // keep track of the sector we are adding to or editing
-    // 100, 100, 250
-    float default_color[3] = {(float)100/255, (float)100/255, (float)255/255};
 
-    Mode currentMode = VISUAL;
+    Vector2f originalMousePos;
+    bool isMoving = false; // Track if move operation is active
+
+
+    // 100, 100, 250
+    float floor_color[3] = { (float)100 / 255, (float)100 / 255, (float)255 / 255 };
+    float wall_color[3] = { (float)100 / 255, (float)100 / 255, (float)255 / 255 };
+    float ceiling_color[3] = { (float)100 / 255, (float)100 / 255, (float)255 / 255 };
+
+    Mode current_mode = VISUAL;
     float gridSize = 50.0f; // Grid size for snapping
 
     // Main game loop
@@ -59,24 +70,27 @@ int main() {
 
             if (event.type == Event::KeyPressed) {
                 if (event.key.code == Keyboard::C) {
-                    currentMode = CREATE;
+                    current_mode = CREATE;
                     vertices.clear(); // Clear previous vertices
                 }
                 else if (event.key.code == Keyboard::V) {
-                    currentMode = VISUAL;
+                    current_mode = VISUAL;
                 }
                 else if (event.key.code == Keyboard::E) {
-                    currentMode = EDIT;
+                    current_mode = EDIT;
                 }
-                else if (event.key.code == Keyboard::Enter && currentMode == CREATE && !vertices.empty()) {
+                else if (event.key.code == Keyboard::M) {
+                    current_mode = MOVE;
+                }
+                else if (event.key.code == Keyboard::Enter && current_mode == CREATE && !vertices.empty()) {
                     if (vertices.size() > 2) {
                         Sector sector;
                         sector.vertices = vertices;
-                        Color col((int)(default_color[0]*255), (int)(default_color[1]*255), (int)(default_color[2]*255));
+                        Color col((int)(floor_color[0]*255), (int)(floor_color[1]*255), (int)(floor_color[2]*255));
                         sector.floorColor = (col); // Semi-transparent
                         sectors[current_sector] = sector;
                         sectors[current_sector].initialized = true; // makes it so that we know what is actually initialized
-                        currentMode = VISUAL;   // stops you from drawing imediately after
+                        current_mode = VISUAL;   // stops you from drawing imediately after
                     }
                     else {
                         // They tried to make a convex shape with less than 3 points
@@ -93,9 +107,9 @@ int main() {
                             sectors.push_back(*(new Sector));
                         }
                         else {
-                            default_color[0] = (float)(sectors[current_sector+1].floorColor.r) / 255;
-                            default_color[1] = (float)(sectors[current_sector+1].floorColor.g) / 255;
-                            default_color[2] = (float)(sectors[current_sector+1].floorColor.b) / 255;
+                            color_float_3(sectors[current_sector + 1].floorColor, floor_color);
+                            color_float_3(sectors[current_sector + 1].wallColor, wall_color);
+                            color_float_3(sectors[current_sector + 1].ceilingColor, ceiling_color);
                         }
                         current_sector++;
                         
@@ -104,9 +118,9 @@ int main() {
                 else if (event.key.code == Keyboard::Left) {
                     if (current_sector - 1 >= 0) {
                         current_sector--;
-                        default_color[0] = (float)(sectors[current_sector].floorColor.r) / 255;
-                        default_color[1] = (float)(sectors[current_sector].floorColor.g) / 255;
-                        default_color[2] = (float)(sectors[current_sector].floorColor.b) / 255;
+                        color_float_3(sectors[current_sector].floorColor, floor_color);
+                        color_float_3(sectors[current_sector].wallColor, wall_color);
+                        color_float_3(sectors[current_sector].ceilingColor, ceiling_color);
                     }
                 }
                 else if (event.key.code == Keyboard::Q) {
@@ -117,7 +131,7 @@ int main() {
                 
             }
 
-            if (currentMode == EDIT) {
+            if (current_mode == EDIT) {
                 if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                     Vector2f mouseWorldPos = window.mapPixelToCoords(Mouse::getPosition(window));
                     for (size_t i = 0; i < sectors[current_sector].vertices.size(); ++i) {
@@ -141,7 +155,36 @@ int main() {
                 }
             }
 
-            if (currentMode == CREATE && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+            if (current_mode == MOVE) {
+                if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+                    Vector2f mouseWorldPos = window.mapPixelToCoords(Mouse::getPosition(window));
+                    for (size_t i = 0; i < sectors[current_sector].vertices.size(); ++i) {
+                        FloatRect vertexRect(sectors[current_sector].vertices[i].x - 5, sectors[current_sector].vertices[i].y - 5, 10, 10);
+
+                        if (vertexRect.contains(mouseWorldPos)) {
+                            selectedVertexIndex = i;
+                            vertexSelected = true;
+                            break;
+                        }
+                    }
+                }
+                else if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Right) {
+                    vertexSelected = false;
+                    selectedVertexIndex = -1;
+                }
+                else if (event.type == Event::MouseMoved && vertexSelected == true) {
+                    if (selectedVertexIndex != -1) {
+                        sf::Vector2f new_pos = snap_to_grid(window.mapPixelToCoords(Mouse::getPosition(window)), gridSize);
+                        sf::Vector2f delta = new_pos - sectors[current_sector].vertices[selectedVertexIndex];
+                        for (Vector2f& v : sectors[current_sector].vertices) {
+                            v += delta;
+                        }
+                    }
+                }
+            }
+
+
+            if (current_mode == CREATE && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 Vector2f worldPos = window.mapPixelToCoords(Mouse::getPosition(window));
                 vertices.push_back(snap_to_grid(worldPos, gridSize));
             }
@@ -155,7 +198,7 @@ int main() {
         window.setView(camera);
         draw_grid(window, camera);
 
-        if (currentMode == EDIT) {
+        if (current_mode == EDIT || current_mode == MOVE) {
             for (const auto& vertex : vertices) {
                 RectangleShape vertexMarker(Vector2f(10, 10));
                 vertexMarker.setPosition(vertex.x - 5, vertex.y - 5);
@@ -173,7 +216,7 @@ int main() {
             }
         }
 
-        if (currentMode == EDIT && sectors[current_sector].initialized) {
+        if ((current_mode == EDIT || current_mode == MOVE) && sectors[current_sector].initialized) {
             draw_vertex_markers(window, sectors[current_sector].vertices);
         }
 
@@ -184,7 +227,10 @@ int main() {
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("New", "Ctrl+N")) {
-                    // New action
+                    current_mode = VISUAL;
+                    sectors.clear();
+                    current_sector = 0;
+                    sectors.push_back(*(new Sector));
                 }
                 if (ImGui::MenuItem("Open", "Ctrl+O")) {
                     // Open action
@@ -213,11 +259,14 @@ int main() {
         
         ImGui::Begin("Edit Tools");
         std::string _mode = "Mode: ";
-        if (currentMode == VISUAL) {
+        if (current_mode == VISUAL) {
             _mode += "VISUAL";
         }
-        else if (currentMode == EDIT) {
+        else if (current_mode == EDIT) {
             _mode += "EDIT";
+        }
+        else if (current_mode == MOVE) {
+            _mode += "MOVE";
         }
         else {
             _mode += "CREATE";
@@ -225,13 +274,15 @@ int main() {
         ImGui::Text(_mode.c_str());
         ImGui::Text("Current Sector: %i", current_sector);
         if (sectors[current_sector].initialized) {
-            ImGui::ColorEdit3("Floor Color", default_color);
+            ImGui::ColorEdit3("Floor Color", floor_color);
+            ImGui::ColorEdit3("Wall Color", wall_color);
+            ImGui::ColorEdit3("Ceiling Color", ceiling_color);
             /* Need to make sure that the sector exists */
             ImGui::SliderFloat("Floor Height", &sectors[current_sector].floorHeight, -1, 1);
             ImGui::SliderFloat("Ceiling Height", &sectors[current_sector].ceilingHeight, -1, 1);
-            if (Color((int)(default_color[0] * 255), (int)(default_color[1] * 255), (int)(default_color[2] * 255)) != sectors[current_sector].floorColor) {
-                sectors[current_sector].floorColor = Color((int)(default_color[0] * 255), (int)(default_color[1] * 255), (int)(default_color[2] * 255));
-            }
+            sectors[current_sector].floorColor = float_3_color(floor_color);
+            sectors[current_sector].ceilingColor = float_3_color(ceiling_color);
+            sectors[current_sector].wallColor = float_3_color(wall_color);
         }
         else {
             ImGui::Text("No Convex Shape");
@@ -366,4 +417,18 @@ void SetupImGuiStyle() {
     style.WindowRounding = 5.0f;
 }
 
+sf::Color float_3_color(float color[3]) {
+    return sf::Color(
+        static_cast<unsigned char>(color[0] * 255),
+        static_cast<unsigned char>(color[1] * 255),
+        static_cast<unsigned char>(color[2] * 255),
+        255  // Alpha value set to 255 for full opacity
+    );
+}
 
+
+void color_float_3(sf::Color color, float output[3]) {
+    output[0] = color.r / 255.0f;
+    output[1] = color.g / 255.0f;
+    output[2] = color.b / 255.0f;
+}

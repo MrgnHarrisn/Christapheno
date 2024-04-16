@@ -4,7 +4,8 @@ This is a more advanced and better designed map editor for a build-style engine
 
 ## Goals
 - [x] Vertex Editing
-- [ ] Wall Editing
+- [x] Move sectors
+- [x] Wall Editing
 - [ ] Texture Changing
 - [ ] Floor and Ceiling Changes
 - [ ] 'Portals' between sectors (Doorways etc.)

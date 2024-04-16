@@ -31,6 +31,8 @@ public:
     sf::ConvexShape get_shape(bool is_selected) {
 
         sf::ConvexShape shape;
+        shape.setOutlineColor(wallColor);
+        shape.setOutlineThickness(1.5);
         shape.setPointCount(vertices.size());
         for (size_t i = 0; i < vertices.size(); ++i) {
             shape.setPoint(i, vertices[i]);
