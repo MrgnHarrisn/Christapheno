@@ -131,7 +131,8 @@ int main() {
                 
             }
 
-            if (current_mode == EDIT) {
+            /* Can probably merge EDIT and MOVE into one */
+            if (current_mode == EDIT || current_mode == MOVE) {
                 if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                     Vector2f mouseWorldPos = window.mapPixelToCoords(Mouse::getPosition(window));
                     for (size_t i = 0; i < sectors[current_sector].vertices.size(); ++i) {
@@ -150,34 +151,15 @@ int main() {
                 }
                 else if (event.type == Event::MouseMoved && vertexSelected == true) {
                     if (selectedVertexIndex != -1) {
-                        sectors[current_sector].vertices[selectedVertexIndex] = snap_to_grid(window.mapPixelToCoords(Mouse::getPosition(window)), gridSize);
-                    }
-                }
-            }
-
-            if (current_mode == MOVE) {
-                if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
-                    Vector2f mouseWorldPos = window.mapPixelToCoords(Mouse::getPosition(window));
-                    for (size_t i = 0; i < sectors[current_sector].vertices.size(); ++i) {
-                        FloatRect vertexRect(sectors[current_sector].vertices[i].x - 5, sectors[current_sector].vertices[i].y - 5, 10, 10);
-
-                        if (vertexRect.contains(mouseWorldPos)) {
-                            selectedVertexIndex = i;
-                            vertexSelected = true;
-                            break;
+                        if (current_mode == EDIT) {
+                            sectors[current_sector].vertices[selectedVertexIndex] = snap_to_grid(window.mapPixelToCoords(Mouse::getPosition(window)), gridSize);
                         }
-                    }
-                }
-                else if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Right) {
-                    vertexSelected = false;
-                    selectedVertexIndex = -1;
-                }
-                else if (event.type == Event::MouseMoved && vertexSelected == true) {
-                    if (selectedVertexIndex != -1) {
-                        sf::Vector2f new_pos = snap_to_grid(window.mapPixelToCoords(Mouse::getPosition(window)), gridSize);
-                        sf::Vector2f delta = new_pos - sectors[current_sector].vertices[selectedVertexIndex];
-                        for (Vector2f& v : sectors[current_sector].vertices) {
-                            v += delta;
+                        else {
+                            sf::Vector2f new_pos = snap_to_grid(window.mapPixelToCoords(Mouse::getPosition(window)), gridSize);
+                            sf::Vector2f delta = new_pos - sectors[current_sector].vertices[selectedVertexIndex];
+                            for (Vector2f& v : sectors[current_sector].vertices) {
+                                v += delta;
+                            }
                         }
                     }
                 }
