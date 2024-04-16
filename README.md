@@ -1,12 +1,18 @@
 # Christapheno
 Yet another map editor—this time, I swear it will be good!
+This is a more advanced and better designed map editor for a build-style engine
 
 ## Goals
 - [x] Vertex Editing
 - [ ] Wall Editing
-- [ ] Real-time Texture Changing
-- [ ] Real-time Floor and Ceiling Changes
-
+- [ ] Texture Changing
+- [ ] Floor and Ceiling Changes
+- [ ] 'Portals' between sectors (Doorways etc.)
+- [ ] Wall Decals
+- [ ] Object spawns
+- [ ] Player spawns
+- [ ] Entity spawns
+- [ ] Texture Manager
 
 ## Requirements
 - `imgui-sfml`
