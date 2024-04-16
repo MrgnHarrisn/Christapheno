@@ -89,7 +89,13 @@ int main() {
                 else if (event.key.code == Keyboard::Right) {
                     if (current_sector + 1 <= sectors.size() && sectors[current_sector].initialized) {
                         if (sectors.size() == current_sector + 1) {
+                            printf("Don't change the color\n");
                             sectors.push_back(*(new Sector));
+                        }
+                        else {
+                            default_color[0] = (float)(sectors[current_sector+1].floorColor.r) / 255;
+                            default_color[1] = (float)(sectors[current_sector+1].floorColor.g) / 255;
+                            default_color[2] = (float)(sectors[current_sector+1].floorColor.b) / 255;
                         }
                         current_sector++;
                         
@@ -98,6 +104,9 @@ int main() {
                 else if (event.key.code == Keyboard::Left) {
                     if (current_sector - 1 >= 0) {
                         current_sector--;
+                        default_color[0] = (float)(sectors[current_sector].floorColor.r) / 255;
+                        default_color[1] = (float)(sectors[current_sector].floorColor.g) / 255;
+                        default_color[2] = (float)(sectors[current_sector].floorColor.b) / 255;
                     }
                 }
                 else if (event.key.code == Keyboard::Q) {
@@ -115,13 +124,6 @@ int main() {
                         FloatRect vertexRect(sectors[current_sector].vertices[i].x - 5, sectors[current_sector].vertices[i].y - 5, 10, 10);
 
                         if (vertexRect.contains(mouseWorldPos)) {
-                            std::cout << "Vertex selected at index: " << i << std::endl;
-                        }
-                        else {
-                            std::cout << "No vertex selected" << std::endl;
-                        }
-
-                        if (vertexRect.contains(mouseWorldPos)) {
                             selectedVertexIndex = i;
                             vertexSelected = true;
                             break;
@@ -129,13 +131,12 @@ int main() {
                     }
                 }
                 else if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Right) {
-                    printf("Put down vertex\n");
                     vertexSelected = false;
                     selectedVertexIndex = -1;
                 }
                 else if (event.type == Event::MouseMoved && vertexSelected == true) {
                     if (selectedVertexIndex != -1) {
-                        sectors[current_sector].vertices[selectedVertexIndex] = window.mapPixelToCoords(Mouse::getPosition(window));
+                        sectors[current_sector].vertices[selectedVertexIndex] = snap_to_grid(window.mapPixelToCoords(Mouse::getPosition(window)), gridSize);
                     }
                 }
             }
@@ -228,7 +229,9 @@ int main() {
             /* Need to make sure that the sector exists */
             ImGui::SliderFloat("Floor Height", &sectors[current_sector].floorHeight, -1, 1);
             ImGui::SliderFloat("Ceiling Height", &sectors[current_sector].ceilingHeight, -1, 1);
-            sectors[current_sector].floorColor = Color((int)(default_color[0] * 255), (int)(default_color[1] * 255), (int)(default_color[2] * 255));
+            if (Color((int)(default_color[0] * 255), (int)(default_color[1] * 255), (int)(default_color[2] * 255)) != sectors[current_sector].floorColor) {
+                sectors[current_sector].floorColor = Color((int)(default_color[0] * 255), (int)(default_color[1] * 255), (int)(default_color[2] * 255));
+            }
         }
         else {
             ImGui::Text("No Convex Shape");
