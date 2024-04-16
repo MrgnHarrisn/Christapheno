@@ -62,6 +62,6 @@ void Camera::update(float deltaTime)
 
 float Camera::get_adjusted_speed() const {
     // Calculate speed multiplier based on zoom level and whether shift is pressed
-    float speed_multiplier = shift_pressed ? 4.0f : 1.0f; // More aggressive multiplier for Shift
-    return base_move_speed * speed_multiplier / sqrt(zoom_level); // Adjust for zoom level nonlinearly
+    float speed_multiplier = shift_pressed ? 4.0f : 1.0f;
+    return base_move_speed * speed_multiplier / sqrt(zoom_level);
 }
