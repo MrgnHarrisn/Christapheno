@@ -1,6 +1,7 @@
 # Christapheno
 Yet another map editor—this time, I swear it will be good!
 This is a more advanced and better designed map editor for a build-style engine
+I need to refactor my code
 
 ## Goals
 - [x] Vertex Editing
