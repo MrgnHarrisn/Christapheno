@@ -28,6 +28,7 @@ void Editor::start()
 
     // initialize imgui-sfml
     ImGui::SFML::Init(*m_window);
+    setup_imgui_style();
     m_clock.restart();
     while (is_open())
     {
@@ -203,7 +204,7 @@ void Editor::handle_events()
         ImGui::SFML::ProcessEvent(event);
 
         if (event.type == sf::Event::Closed)
-            close();
+            m_window->close();
 
         m_camera->handle_event(event);
 
