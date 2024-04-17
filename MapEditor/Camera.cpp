@@ -50,6 +50,11 @@ void Camera::handle_event(const sf::Event& event)
     }
 }
 
+void Camera::set_size(sf::Vector2u size)
+{
+    reset(sf::FloatRect(0, 0, size.x, size.y));
+}
+
 void Camera::update(float deltaTime)
 {
     float adjusted_speed = get_adjusted_speed();

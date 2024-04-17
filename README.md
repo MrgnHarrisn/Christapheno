@@ -20,6 +20,7 @@ Here is a [video](https://youtu.be/TGkW_AIIZzI) demo of the level/map editor
 - [ ] Entity spawns
 - [ ] Texture Manager
 - [ ] Saving and Loading files
+- [ ] Key binds
 
 I hope to be able to make a small FPS game when I have fully finished the editor and renderer, just to see how much I can do with this sort of project.
 

@@ -2,7 +2,7 @@
 
 Editor::Editor(int width, int height)
 {
-    m_window = new sf::RenderWindow(sf::VideoMode(width, height), "Map Editor", sf::Style::None | sf::Style::Close);
+    m_window = new sf::RenderWindow(sf::VideoMode(width, height), "Map Editor");
     m_window->setFramerateLimit(60);
 
     
@@ -139,7 +139,12 @@ void Editor::render_imgui()
         _mode += "CREATE";
     }
     ImGui::Text(_mode.c_str());
-    ImGui::Text("Vertices: %i", m_vertices.size());
+    if (!m_sectors[m_current_sector].initialized) {
+        ImGui::Text("Vertices: %i", m_vertices.size());
+    }
+    else {
+        ImGui::Text("Vertices: %i", m_sectors[m_current_sector].vertices.size());
+    }
     ImGui::Text("Current Sector: %i", m_current_sector);
     if (m_sectors[m_current_sector].initialized) {
         ImGui::ColorEdit3("Floor Color", m_floor_color);
@@ -267,6 +272,9 @@ void Editor::handle_events()
                 }
                 break;
             }
+        }
+        else if (event.type == sf::Event::Resized) {
+            m_camera->set_size(m_window->getSize());
         }
 
         if (m_mode == EDIT || m_mode == MOVE) {

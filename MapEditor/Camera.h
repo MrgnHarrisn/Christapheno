@@ -25,6 +25,7 @@ public:
 
     // Function to handle input events
     void handle_event(const sf::Event& event);
+    void set_size(sf::Vector2u size);
 
 private:
     float base_move_speed; // Base speed of camera movement
