@@ -257,6 +257,7 @@ void Editor::handle_events()
                     m_current_sector++;
 
                 }
+                break;
             case sf::Keyboard::Left:
                 if (m_current_sector - 1 >= 0) {
                     m_current_sector--;
