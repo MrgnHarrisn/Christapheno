@@ -196,8 +196,6 @@ void Editor::handle_events()
     
     sf::Event event;
 
-    
-
     while (m_window->pollEvent(event))
     {
 

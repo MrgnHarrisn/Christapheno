@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include <SFML/Graphics.hpp>
+#include "Utils.h"
+#include <Thor/Shapes.hpp>
 
 class Sector {
 public:
@@ -26,9 +27,11 @@ public:
     /// Gets the sector as a sf::ConvexShape
     /// </summary>
     /// <returns>output sf::ConvexShape</returns>
-    sf::ConvexShape get_shape(bool is_selected) {
+    thor::ConcaveShape get_shape(bool is_selected) {
 
-        sf::ConvexShape shape;
+        thor::ConcaveShape shape;
+
+        //sf::ConvexShape shape;
         shape.setOutlineColor(wall_color);
         shape.setOutlineThickness(1.5);
         shape.setPointCount(vertices.size());
@@ -39,6 +42,7 @@ public:
         sf::Color color = is_selected ? floor_color : sf::Color(floor_color.r, floor_color.g, floor_color.b, 100);
         shape.setFillColor(color);
         return shape;
+
     }
 };
 

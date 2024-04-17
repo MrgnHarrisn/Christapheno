@@ -8,7 +8,7 @@ I *need* to refactor my code
 - [x] Move sectors
 - [x] Wall Editing
 - [ ] Texture Changing
-- [ ] Floor and Ceiling Changes
+- [x] Floor and Ceiling Changes
 - [ ] 'Portals' between sectors (Doorways etc.)
 - [ ] Wall Decals
 - [ ] Object spawns
@@ -24,3 +24,4 @@ I use vcpkg for getting these dependencies
 - `imgui-sfml`
 - `sfml`
 - `imgui`
+- `thor`

@@ -17,7 +17,7 @@ void Utils::draw_shape(sf::RenderWindow& window, const std::vector<sf::Vector2f>
     if (vertices.size() < 2) return; // Not enough points to form a line
 
     // Draw the shape being currently created
-    sf::ConvexShape tempShape;
+    thor::ConcaveShape tempShape;
     tempShape.setPointCount(vertices.size());
     for (size_t i = 0; i < vertices.size(); ++i) {
         tempShape.setPoint(i, vertices[i]);
@@ -83,4 +83,71 @@ void Utils::color_float_3(sf::Color color, float output[3])
     output[0] = color.r / 255.0f;
     output[1] = color.g / 255.0f;
     output[2] = color.b / 255.0f;
+}
+
+std::vector<sf::Vector2f> Utils::concave_to_convex(const std::vector<sf::Vector2f>& vertices) {
+    std::vector<sf::Vector2f> output;
+    if (vertices.size() < 3) {
+        return vertices;  // A polygon cannot have less than 3 points
+    }
+
+    int size = vertices.size();
+    for (int i = 0; i < size; ++i) {
+        int prev = (i - 1 + size) % size;
+        int next = (i + 1) % size;
+
+        sf::Vector2f prevPoint = vertices[prev];
+        sf::Vector2f currentPoint = vertices[i];
+        sf::Vector2f nextPoint = vertices[next];
+
+        
+    }
+
+    return output;
+}
+
+float Utils::cross_product(sf::Vector2f a, sf::Vector2f b)
+{
+    return a.x * b.y - a.y * b.x;
+}
+
+sf::Vector2f Utils::get_item(std::vector<sf::Vector2f>& vertices, size_t index)
+{
+    if (index >= vertices.size()) {
+        return vertices[index & vertices.size()];
+    }
+    else if (index < 0) {
+        return vertices[index & vertices.size() + vertices.size()];
+    }
+    else {
+        return vertices[index];
+    }
+}
+
+float Utils::get_polygon_area(std::vector<sf::Vector2f>& vertices)
+{
+    int n = vertices.size();
+    if (n < 3) return 0.0f; // Not a polygon
+
+    float area = 0.0f;
+    for (int i = 0; i < n; i++) {
+        int j = (i + 1) % n; // Next vertex index, with wrap-around
+        area += vertices[i].x * vertices[j].y - vertices[j].x * vertices[i].y;
+    }
+    return std::abs(area) / 2.0f;
+}
+
+void Utils::render_concave(sf::RenderWindow& window, std::vector<sf::Vector2f>& vertices)
+{
+
+}
+
+bool Utils::is_point_in_triangle(const sf::Vector2f& pt, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Vector2f& v3)
+{
+    float d1 = (pt.x - v2.x) * (v1.y - v2.y) - (v1.x - v2.x) * (pt.y - v2.y);
+    float d2 = (pt.x - v3.x) * (v2.y - v3.y) - (v2.x - v3.x) * (pt.y - v3.y);
+    float d3 = (pt.x - v1.x) * (v3.y - v1.y) - (v3.x - v1.x) * (pt.y - v1.y);
+    bool has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+    bool has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+    return !(has_neg && has_pos);
 }
