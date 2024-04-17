@@ -6,7 +6,18 @@
 class Camera : public sf::View
 {
 public:
+
+    /// <summary>
+    /// Default constructor
+    /// </summary>
     Camera();
+
+
+    /// <summary>
+    /// Constructor with size
+    /// </summary>
+    /// <param name="width">int</param>
+    /// <param name="height">int</param>
     Camera(int width, int height);
 
     // Update method to be called every frame

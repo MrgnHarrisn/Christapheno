@@ -12,18 +12,47 @@
 class Editor
 {
 public:
+
+	/// <summary>
+	/// Constructor for editor with width and height
+	/// </summary>
+	/// <param name="width">int</param>
+	/// <param name="height">int</param>
 	Editor(int width, int height);
+
+	/// <summary>
+	/// starts the editor
+	/// </summary>
 	void start();
 private:
 
 	// Editor Functions
 	void update();
+
+	/// <summary>
+	/// checks if the window is open
+	/// </summary>
+	/// <returns></returns>
 	bool is_open();
+
+	/// <summary>
+	/// Closes the window and imgui
+	/// </summary>
 	void close();
 
-	// imgui functions
+	/// <summary>
+	/// Runs the imgui windows
+	/// </summary>
 	void render_imgui();
+
+	/// <summary>
+	/// Decorates and customizes the imgui UI
+	/// </summary>
 	void setup_imgui_style();
+
+	/// <summary>
+	/// runs all event handlers
+	/// </summary>
 	void handle_events();
 	
 	Camera* m_camera;
