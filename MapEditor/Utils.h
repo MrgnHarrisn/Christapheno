@@ -43,5 +43,14 @@ public:
 	/// <param name="output">float[3]</param>
 	static void color_float_3(sf::Color color, float output[3]);
 
+	/// <summary>
+	/// Checks for overlapping vectors
+	/// </summary>
+	/// <param name="target">position to check</param>
+	/// <param name="others">positions to check against</param>
+	/// <param name="index">optional index of vector to ignore</param>
+	/// <returns>found occupid spot</returns>
+	static bool is_overlapping_vec(sf::Vector2f target, const std::vector<sf::Vector2f>& others, int index = -1);
+
 };
 

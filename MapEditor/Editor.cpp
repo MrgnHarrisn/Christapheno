@@ -139,6 +139,7 @@ void Editor::render_imgui()
         _mode += "CREATE";
     }
     ImGui::Text(_mode.c_str());
+    ImGui::Text("Vertices: %i", m_vertices.size());
     ImGui::Text("Current Sector: %i", m_current_sector);
     if (m_sectors[m_current_sector].initialized) {
         ImGui::ColorEdit3("Floor Color", m_floor_color);
@@ -207,43 +208,45 @@ void Editor::handle_events()
         m_camera->handle_event(event);
 
         if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::C) {
+            switch (event.key.code) {
+            case sf::Keyboard::C:
                 m_mode = CREATE;
-                m_vertices.clear(); // Clear previous vertices
-            }
-            else if (event.key.code == sf::Keyboard::V) {
-                m_mode = VISUAL;
-            }
-            else if (event.key.code == sf::Keyboard::E) {
-                m_mode = EDIT;
-            }
-            else if (event.key.code == sf::Keyboard::M) {
-                m_mode = MOVE;
-            }
-            else if (event.key.code == sf::Keyboard::Enter && m_mode == CREATE && !m_vertices.empty()) {
-                if (m_vertices.size() > 2) {
-                    Sector sector;
-                    sector.vertices = m_vertices;
-
-                    sector.floor_color = Utils::float_3_color(m_floor_color);
-                    sector.ceiling_color = Utils::float_3_color(m_ceiling_color);
-                    sector.wall_color = Utils::float_3_color(m_wall_color);
-                    m_sectors[m_current_sector] = sector;
-                    m_sectors[m_current_sector].initialized = true; // makes it so that we know what is actually initialized
-                    m_mode = VISUAL;   // stops you from drawing imediately after
-                }
-                else {
-                    // They tried to make a convex shape with less than 3 points
-                    printf("Invalid Shape!\n");
-                    continue;
-                }
-                // clear the stuff
                 m_vertices.clear();
-            }
-            else if (event.key.code == sf::Keyboard::Right) {
+                break;
+            case sf::Keyboard::V:
+                m_mode = VISUAL;
+                break;
+            case sf::Keyboard::E:
+                m_mode = EDIT;
+                break;
+            case sf::Keyboard::M:
+                m_mode = MOVE;
+                break;
+            case sf::Keyboard::Enter:
+                if (m_mode == CREATE && !m_vertices.empty()) {
+                    if (m_vertices.size() > 2) {
+                        Sector sector;
+                        sector.vertices = m_vertices;
+
+                        sector.floor_color = Utils::float_3_color(m_floor_color);
+                        sector.ceiling_color = Utils::float_3_color(m_ceiling_color);
+                        sector.wall_color = Utils::float_3_color(m_wall_color);
+                        m_sectors[m_current_sector] = sector;
+                        m_sectors[m_current_sector].initialized = true; // makes it so that we know what is actually initialized
+                        m_mode = VISUAL;   // stops you from drawing imediately after
+                    }
+                    else {
+                        // They tried to make a convex shape with less than 3 points
+                        printf("Invalid Shape!\n");
+                        continue;
+                    }
+                    // clear the stuff
+                    m_vertices.clear();
+                }
+                break;
+            case sf::Keyboard::Right:
                 if (m_current_sector + 1 <= m_sectors.size() && m_sectors[m_current_sector].initialized) {
                     if (m_sectors.size() == m_current_sector + 1) {
-                        printf("Don't change the color\n");
                         m_sectors.push_back(*(new Sector));
                     }
                     else {
@@ -254,20 +257,14 @@ void Editor::handle_events()
                     m_current_sector++;
 
                 }
-            }
-            else if (event.key.code == sf::Keyboard::Left) {
+            case sf::Keyboard::Left:
                 if (m_current_sector - 1 >= 0) {
                     m_current_sector--;
                     Utils::color_float_3(m_sectors[m_current_sector].floor_color, m_floor_color);
                     Utils::color_float_3(m_sectors[m_current_sector].wall_color, m_wall_color);
                     Utils::color_float_3(m_sectors[m_current_sector].ceiling_color, m_ceiling_color);
                 }
-            }
-            else if (event.key.code == sf::Keyboard::Q) {
-                // debugging stuff
-                /*for (int i = 0; i < m_sectors.size(); i++) {
-                    std::cout << "Sector: " << i << " is " << (sectors[i].initialized ? "" : "not ") << "initialized.\n";
-                }*/
+                break;
             }
         }
 
@@ -291,7 +288,14 @@ void Editor::handle_events()
             else if (event.type == sf::Event::MouseMoved && m_vertex_is_selected == true) {
                 if (m_selected_vertex != -1) {
                     if (m_mode == EDIT) {
-                        m_sectors[m_current_sector].vertices[m_selected_vertex] = Utils::snap_to_grid(m_window->mapPixelToCoords(sf::Mouse::getPosition(*m_window)), grid_size);
+                        // Snap new position to grid
+                        sf::Vector2f new_pos = Utils::snap_to_grid(m_window->mapPixelToCoords(sf::Mouse::getPosition(*m_window)), grid_size);
+
+                        // If there's no vertex close to the new position, update the selected vertex position
+                        
+                        if (Utils::is_overlapping_vec(new_pos, m_sectors[m_current_sector].vertices, m_selected_vertex)) {
+                            m_sectors[m_current_sector].vertices[m_selected_vertex] = new_pos;
+                        }
                     }
                     else {
                         sf::Vector2f new_pos = Utils::snap_to_grid(m_window->mapPixelToCoords(sf::Mouse::getPosition(*m_window)), grid_size);
@@ -306,7 +310,10 @@ void Editor::handle_events()
 
         if (m_mode == CREATE && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2f worldPos = m_window->mapPixelToCoords(sf::Mouse::getPosition(*m_window));
-            m_vertices.push_back(Utils::snap_to_grid(worldPos, grid_size));
+            if (Utils::is_overlapping_vec(Utils::snap_to_grid(worldPos, grid_size), m_vertices)) {
+                m_vertices.push_back(Utils::snap_to_grid(worldPos, grid_size));
+            }
+            
         }
     }
 

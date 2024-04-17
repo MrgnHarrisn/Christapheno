@@ -84,3 +84,22 @@ void Utils::color_float_3(sf::Color color, float output[3])
     output[1] = color.g / 255.0f;
     output[2] = color.b / 255.0f;
 }
+
+
+bool Utils::is_overlapping_vec(sf::Vector2f target, const std::vector<sf::Vector2f>& others, int index)
+{
+
+    if (others.size() == 0) { return true; }
+
+    for (size_t i = 0; i < others.size(); ++i) {
+        if (i == index) continue;
+
+        if (target == others[i]) {
+            return false;
+        }
+
+    }
+
+    return true;
+
+}
