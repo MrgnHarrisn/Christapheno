@@ -166,7 +166,7 @@ void Utils::save(std::vector<Sector>& sectors) {
 
 void Utils::goto_sectors(std::vector<Sector>& sectors, Camera& camera, size_t sector)
 {
-    if (sectors.empty() || sector >= sectors.size()) {
+    if (sectors.empty() || sector >= sectors.size() || !sectors[sector].initialized) {
         printf("No sectors found!\n");
         camera.setCenter(0, 0);
         return;
