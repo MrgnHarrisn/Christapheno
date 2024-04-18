@@ -7,6 +7,7 @@
 #include <imgui-SFML.h>
 #include "Mode.h"
 #include <vector>
+#include <cmath>
 #include "Utils.h"
 
 class Editor

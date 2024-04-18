@@ -27,10 +27,14 @@ public:
     void handle_event(const sf::Event& event);
     void set_size(sf::Vector2u size);
 
+    double get_zoom();
+
+    long get_zoom_count();
+
 private:
     float base_move_speed; // Base speed of camera movement
-    float zoom_level;      // Current zoom level
-    float zoom_speed;      // Speed of zooming in/out
+    double zoom_level;      // Current zoom level
+    double zoom_speed;      // Speed of zooming in/out
 
     // Movement flags
     bool shift_pressed;    // Indicates if Shift key is pressed
@@ -38,6 +42,8 @@ private:
     bool moving_down;
     bool moving_left;
     bool moving_right;
+
+    long zoom_count;
 
     // Adjust move speed based on zoom level and shift key
     float get_adjusted_speed() const;

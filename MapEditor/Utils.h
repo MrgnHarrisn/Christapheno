@@ -1,7 +1,19 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <Thor/Shapes.hpp>
+
+#include <nfd.h>
+#include <Windows.h>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include "Camera.h"
+#include "Sector.h"
+
+#define dbg(X) std::cout << X << std::endl;
 
 class Utils
 {
@@ -25,7 +37,7 @@ public:
 	/// </summary>
 	/// <param name="window">sf::RenderTarget</param>
 	/// <param name="camera">Camera</param>
-	static void draw_grid(sf::RenderWindow& window, const Camera& camera);
+	static void draw_grid(sf::RenderWindow& window, const Camera& camera, double grid_spacing);
 	
 	static sf::Vector2f snap_to_grid(const sf::Vector2f& point, float gridSize);
 
@@ -51,6 +63,14 @@ public:
 	/// <param name="index">optional index of vector to ignore</param>
 	/// <returns>found occupid spot</returns>
 	static bool is_overlapping_vec(sf::Vector2f target, const std::vector<sf::Vector2f>& others, int index = -1);
+
+	static double get_dynamic_grid_size(double zoomLevel);
+
+	static void save(std::vector<Sector>& sectors);
+
+	static void goto_sectors(std::vector<Sector>& sectors, Camera& camera, size_t sector);
+
+	static void load(std::vector<Sector>& sectors);
 
 };
 

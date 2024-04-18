@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera() : base_move_speed(100.0f), zoom_level(1.0f), zoom_speed(0.1f),
+Camera::Camera() : base_move_speed(130.0f), zoom_level(1.0f), zoom_speed(0.1f),
 shift_pressed(false), moving_up(false), moving_down(false),
 moving_left(false), moving_right(false)
 {
@@ -16,6 +16,7 @@ moving_left(false), moving_right(false)
 
 void Camera::handle_event(const sf::Event& event)
 {
+
     if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
         bool key_state = (event.type == sf::Event::KeyPressed);
 
@@ -41,10 +42,13 @@ void Camera::handle_event(const sf::Event& event)
         }
     }
     else if (event.type == sf::Event::MouseWheelScrolled) {
-        if (event.mouseWheelScroll.delta > 0)
+        if (event.mouseWheelScroll.delta > 0) {
             zoom(1.0f - zoom_speed);
-        else
+        }
+        else {
             zoom(1.0f + zoom_speed);
+        }
+            
 
         zoom_level *= (event.mouseWheelScroll.delta > 0) ? (1.0f - zoom_speed) : (1.0f + zoom_speed);
     }
@@ -53,6 +57,16 @@ void Camera::handle_event(const sf::Event& event)
 void Camera::set_size(sf::Vector2u size)
 {
     reset(sf::FloatRect(0, 0, size.x, size.y));
+}
+
+double Camera::get_zoom()
+{
+    return zoom_level;
+}
+
+long Camera::get_zoom_count()
+{
+    return zoom_count;
 }
 
 void Camera::update(float deltaTime)
@@ -68,5 +82,5 @@ void Camera::update(float deltaTime)
 float Camera::get_adjusted_speed() const {
     // Calculate speed multiplier based on zoom level and whether shift is pressed
     float speed_multiplier = shift_pressed ? 4.0f : 1.0f;
-    return base_move_speed * speed_multiplier / sqrt(zoom_level);
+    return (base_move_speed * speed_multiplier) * zoom_level;
 }
