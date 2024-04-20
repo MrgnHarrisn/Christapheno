@@ -1,0 +1,15 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 4e5367c..72849f3 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -78,6 +78,10 @@ thor_link_sfml(${THOR_LIB})
+ # Set IDE folder for main project
+ set_target_properties(${THOR_LIB} PROPERTIES FOLDER "Thor")
+ 
++target_include_directories(${THOR_LIB} PUBLIC
++  ${PROJECT_SOURCE_DIR}/include
++  ${PROJECT_SOURCE_DIR}/extlibs/aurora/include
++)
+ 
+ # Install (use "bin" folder for DLL, "lib" for SO files)
+ if(WIN32)
