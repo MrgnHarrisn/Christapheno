@@ -39,6 +39,12 @@ public:
 	/// <param name="camera">Camera</param>
 	static void draw_grid(sf::RenderWindow& window, const Camera& camera, double grid_spacing);
 	
+	/// <summary>
+	/// Snaps a point onto a grid
+	/// </summary>
+	/// <param name="point"></param>
+	/// <param name="gridSize"></param>
+	/// <returns></returns>
 	static sf::Vector2f snap_to_grid(const sf::Vector2f& point, float gridSize);
 
 	/// <summary>

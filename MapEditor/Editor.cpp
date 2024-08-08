@@ -21,6 +21,8 @@ Editor::Editor(int width, int height)
         m_ceiling_color[i] = (i == 2 ? 255.f : 100.f) / 255;
     }
 
+    start();
+
 }
 
 void Editor::start()
@@ -70,7 +72,7 @@ void Editor::update()
     Utils::draw_shape(*m_window, m_vertices);
 
     /* UI comes last! */
-    render_imgui(); // bug here
+    render_imgui(); // bug here 
 
     m_window->display();
 
@@ -120,6 +122,9 @@ void Editor::render_imgui()
         }
         if (ImGui::BeginMenu("Options")) {
             // Options menu items here...
+            if (ImGui::MenuItem("Toggle BSP view")) {
+                display_bsp = !display_bsp;
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();

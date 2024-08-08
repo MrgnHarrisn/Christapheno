@@ -27,6 +27,9 @@ public:
 	void start();
 private:
 
+	// toggles displaying a BSP version
+	bool display_bsp = false;
+
 	// Editor Functions
 	void update();
 
