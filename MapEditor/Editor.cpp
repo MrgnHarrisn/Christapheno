@@ -21,6 +21,8 @@ Editor::Editor(int width, int height)
         m_ceiling_color[i] = (i == 2 ? 255.f : 100.f) / 255;
     }
 
+    start();
+
 }
 
 void Editor::start()
@@ -53,9 +55,9 @@ void Editor::update()
     m_window->setView(*m_camera);
 
     /* Rendering here */
-
-    Utils::draw_grid(*m_window, *m_camera);
-
+    // float get_dynamic_grid_size(float zoomLevel)
+    // Utils::draw_grid(*m_window, *m_camera, Utils::get_dynamic_grid_size(m_camera->get_zoom()));
+    Utils::draw_grid(*m_window, *m_camera, grid_size);
     for (int i = 0; i < m_sectors.size(); i++) {
         /* Check that it isn't an empty sector */
         if (m_sectors[i].initialized) {
@@ -70,7 +72,7 @@ void Editor::update()
     Utils::draw_shape(*m_window, m_vertices);
 
     /* UI comes last! */
-    render_imgui(); // bug here
+    render_imgui(); // bug here 
 
     m_window->display();
 
@@ -98,12 +100,13 @@ void Editor::render_imgui()
                 m_sectors.clear();
                 m_current_sector = 0;
                 m_sectors.push_back(*(new Sector));
+                m_vertices.clear();
             }
             if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                // Open action
+                Utils::load(m_sectors);
             }
             if (ImGui::MenuItem("Save", "Ctrl+S")) {
-                // Save action
+                Utils::save(m_sectors);
             }
             if (ImGui::MenuItem("Save As..")) {
                 // Save As action
@@ -119,6 +122,9 @@ void Editor::render_imgui()
         }
         if (ImGui::BeginMenu("Options")) {
             // Options menu items here...
+            if (ImGui::MenuItem("Toggle BSP view")) {
+                display_bsp = !display_bsp;
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -139,6 +145,7 @@ void Editor::render_imgui()
         _mode += "CREATE";
     }
     ImGui::Text(_mode.c_str());
+
     if (!m_sectors[m_current_sector].initialized) {
         ImGui::Text("Vertices: %i", m_vertices.size());
     }
@@ -214,6 +221,10 @@ void Editor::handle_events()
 
         if (event.type == sf::Event::KeyPressed) {
             switch (event.key.code) {
+            case sf::Keyboard::Space:
+                m_vertices = m_sectors[m_current_sector].vertices;
+                Utils::goto_sectors(m_sectors, *m_camera, m_current_sector);
+                break;
             case sf::Keyboard::C:
                 m_mode = CREATE;
                 m_vertices.clear();
@@ -232,7 +243,7 @@ void Editor::handle_events()
                     if (m_vertices.size() > 2) {
                         Sector sector;
                         sector.vertices = m_vertices;
-
+                        sector.ID = m_current_sector;
                         sector.floor_color = Utils::float_3_color(m_floor_color);
                         sector.ceiling_color = Utils::float_3_color(m_ceiling_color);
                         sector.wall_color = Utils::float_3_color(m_wall_color);
@@ -325,5 +336,4 @@ void Editor::handle_events()
             
         }
     }
-
 }

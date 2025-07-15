@@ -32,3 +32,4 @@ I use vcpkg for getting these dependencies
 - `sfml`
 - `imgui`
 - `thor`
+- `nativefiledialogue`

@@ -7,6 +7,7 @@
 #include <imgui-SFML.h>
 #include "Mode.h"
 #include <vector>
+#include <cmath>
 #include "Utils.h"
 
 class Editor
@@ -25,6 +26,9 @@ public:
 	/// </summary>
 	void start();
 private:
+
+	// toggles displaying a BSP version
+	bool display_bsp = false;
 
 	// Editor Functions
 	void update();

@@ -18,6 +18,7 @@ moving_left(false), moving_right(false)
 
 void Camera::handle_event(const sf::Event& event)
 {
+
     if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
         bool key_state = (event.type == sf::Event::KeyPressed);
 
@@ -43,10 +44,13 @@ void Camera::handle_event(const sf::Event& event)
         }
     }
     else if (event.type == sf::Event::MouseWheelScrolled) {
-        if (event.mouseWheelScroll.delta > 0)
+        if (event.mouseWheelScroll.delta > 0) {
             zoom(1.0f - zoom_speed);
-        else
+        }
+        else {
             zoom(1.0f + zoom_speed);
+        }
+            
 
         zoom_level *= (event.mouseWheelScroll.delta > 0) ? (1.0f - zoom_speed) : (1.0f + zoom_speed);
     }
@@ -55,6 +59,16 @@ void Camera::handle_event(const sf::Event& event)
 void Camera::set_size(sf::Vector2u size)
 {
     reset(sf::FloatRect(0, 0, size.x, size.y));
+}
+
+double Camera::get_zoom()
+{
+    return zoom_level;
+}
+
+long Camera::get_zoom_count()
+{
+    return zoom_count;
 }
 
 void Camera::update(float deltaTime)
