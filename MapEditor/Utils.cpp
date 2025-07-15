@@ -1,5 +1,7 @@
 #include "Utils.h"
 
+#include <cmath>
+
 void Utils::draw_vertex_markers(sf::RenderWindow& window, const std::vector<sf::Vector2f>& vertices)
 {
     float markerSize = 10.0f;  // Size of the rectangle marker
@@ -38,6 +40,9 @@ void Utils::draw_grid(sf::RenderWindow& window, const Camera& camera, double gri
     left = floor(left / grid_size) * grid_size;
     top = floor(top / grid_size) * grid_size;
 
+    // Adjust the start and end to be on the grid
+    startX = std::floor(startX / gridSize) * gridSize;
+    startY = std::floor(startY / gridSize) * gridSize;
     sf::Color col(255, 255, 255, 100);
 
     sf::Vertex line[2];

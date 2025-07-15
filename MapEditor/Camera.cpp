@@ -1,6 +1,8 @@
 #include "Camera.h"
 
-Camera::Camera() : base_move_speed(130.0f), zoom_level(1.0f), zoom_speed(0.1f),
+#include <cmath>
+
+Camera::Camera() : base_move_speed(100.0f), zoom_level(1.0f), zoom_speed(0.1f),
 shift_pressed(false), moving_up(false), moving_down(false),
 moving_left(false), moving_right(false)
 {
@@ -82,5 +84,5 @@ void Camera::update(float deltaTime)
 float Camera::get_adjusted_speed() const {
     // Calculate speed multiplier based on zoom level and whether shift is pressed
     float speed_multiplier = shift_pressed ? 4.0f : 1.0f;
-    return (base_move_speed * speed_multiplier) * zoom_level;
+    return base_move_speed * speed_multiplier / std::sqrt(zoom_level);
 }
